@@ -1,0 +1,430 @@
+/* Import Comic Neue / Comic Sans fonts */
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap');
+
+/* ===== Root variables ===== */
+:root {
+  --card-bg: rgba(255,255,255,0.06);
+  --card-bg-opaque: rgba(255,255,255,0.80);
+  --window-bg: rgba(250,250,250,0.88);
+  --text-foreground: #111;
+  --accent: #1a73e8;
+  --accent-foreground: #fff;
+  --event-color: #1a73e8;
+  --event-foreground: #fff;
+  --rainbow-rotation-duration: 300s;
+  --calendar-width: 900px;
+}
+
+/* ===== Page background ===== */
+html, body {
+  background: transparent; /* allow the rainbow element to show through */
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* allow scrolling so long month grids don't cut off the bottom row */
+  overflow: auto;
+}
+
+/* ===== Rotating Rainbow Background ===== */
+.rainbow-bg {
+  position: fixed;
+  /* Make the gradient element much larger than the viewport so rotating it never exposes corners */
+  width: 160vmax;
+  height: 160vmax;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(0deg);
+  pointer-events: none;
+  background: conic-gradient(from 0deg,
+    #ff8e9a, /* pastel pink */
+    #ffc077, /* pastel orange */
+    #ffff75, /* pastel yellow */
+    #6eff8e, /* pastel mint */
+    #63bbff, /* pastel blue */
+    hsl(264, 100%, 80%), /* pastel lavender */
+    #ff77c2, /* pastel lilac */
+    #ff8e9a  /* loop back */
+  );
+  background-size: cover;
+  transform-origin: 50% 50%;
+  animation: rainbowRotate var(--rainbow-rotation-duration) linear infinite;
+  z-index: 0; /* place behind content but above the page background */
+  filter: blur(6px); /* slightly less blur */
+  opacity: 0.9;
+  will-change: transform;
+}
+
+/* ===== Rainbow animation (rotate the element) ===== */
+@keyframes rainbowRotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .rainbow-bg {
+    animation: none !important;
+  }
+}
+
+/* ===== Calendar Card ===== */
+.calendar {
+  width: var(--calendar-width);
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+  padding: 20px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.72); /* more transparent per request */
+  color: var(--text-foreground);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.36);
+  backdrop-filter: blur(4px);
+  position: relative;
+  z-index: 1; /* ensure calendar sits above the rainbow */
+  transition: width 240ms ease, padding 240ms ease, transform 250ms ease, box-shadow 250ms ease;
+  user-select: none;
+}
+.calendar:hover { 
+  transform: translateY(-4px);
+  box-shadow: 0 18px 38px rgba(0,0,0,0.28);
+}
+
+/* ===== Header ===== */
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.calendar-header h2 {
+  font-size: 20px;
+  margin: 0;
+  color: inherit;
+  text-align: center;
+  flex: 1;
+}
+/* ensure header uses the dynamic text color */
+.calendar-header h2 { color: var(--text-foreground); }
+.calendar-header button {
+  background-color: var(--accent);
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--accent-foreground);
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-weight: bold;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+button.pressed { transform: translateY(2px) scale(.995); box-shadow: 0 4px 10px rgba(0,0,0,0.18) !important; }
+
+.primary-btn {
+  background-color: var(--accent);
+  border: none;
+  color: var(--accent-foreground);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.calendar-header #settingsBtn {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+.calendar-header button:active { transform: translateY(1px) scale(.99); }
+.calendar-header button:hover { box-shadow: 0 10px 22px rgba(26,115,232,0.32); }
+
+/* ===== Weekdays row ===== */
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-weight: bold;
+  color: var(--text-foreground);
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+/* ===== Dates grid ===== */
+.dates {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  grid-auto-rows: 110px; /* slightly smaller default month cell height so calendar fits the viewport */
+}
+
+/* ===== Day cells ===== */
+.day-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 60px;
+  padding: 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  background: rgba(255,255,255,0.1);
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  overflow-y: auto; /* allow scrolling inside day cells */
+  max-height: 240px;
+  box-sizing: border-box;
+}
+.day-cell { box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+.day-cell:hover {
+  background: rgba(255,255,255,0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+}
+
+/* small week nav buttons */
+.small-nav {
+  background: var(--accent);
+  border: none;
+  color: var(--accent-foreground);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  display: none; /* only show in week-mode */
+}
+
+/* week-mode: larger UI for week view */
+.calendar.week-mode {
+  width: calc(var(--calendar-width) * 2.4);
+  padding: 28px;
+}
+@media (max-width: 1100px) {
+  .calendar.week-mode { width: 94%; }
+}
+
+/* show small nav buttons only in week mode */
+.calendar.week-mode .small-nav { display: inline-block; }
+
+/* hide the month weekday row and the month grid while in week mode */
+.calendar.week-mode .days { display: none; }
+.calendar.week-mode .dates { display: none; }
+
+/* make week view font weight match UI boldness */
+.calendar.week-mode, .calendar.week-mode .week-grid, .calendar.week-mode .hour-label, .calendar.week-mode .week-event {
+  font-weight: 600;
+}
+
+/* ===== Date number at top of cell ===== */
+.date-number {
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+/* ensure date numbers use the dynamic text color */
+.date-number { color: var(--text-foreground); }
+
+/* ===== Event boxes ===== */
+.event {
+  background: var(--event-color);
+  color: var(--event-foreground);
+  font-size: 12px;
+  padding: 6px 8px;
+  margin: 6px auto;
+  border-radius: 10px;
+  width: calc(92% - 8px); /* take most of cell width so multiple events stack without shrinking */
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative; /* for inline toolbar */
+  padding-right: 28px; /* space for toolbar */
+  max-height: calc(100% - 12px); /* don't overflow day cell */
+  min-height: 36px; /* keep readable */
+  display: block; box-sizing: border-box;
+}
+
+/* show time and title in event */
+.event .time {
+  font-weight: 700;
+  font-size: 10px;
+  margin-right: 6px;
+}
+
+/* In month view only show title (hide time) */
+.dates .event .time { display: none; }
+
+/* inline mini-toolbar for month events */
+.event .toolbar {
+  display: none;
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  gap: 6px;
+  z-index: 30; /* ensure toolbar sits above other elements */
+}
+.event .toolbar button {
+  background: rgba(0,0,0,0.32);
+  border: none;
+  color: #fff;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 18px;
+  cursor: pointer;
+}
+.day-cell:hover .event .toolbar { display: flex; opacity: 1; }
+
+/* Week view styles */
+.week-view {
+  margin-top: 12px;
+  width: 100%;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+  padding: 12px;
+  max-height: 60vh; /* allow scrolling inside week view */
+  overflow-y: auto;
+}
+.week-grid {
+  display: grid;
+  grid-template-columns: 60px repeat(7, 1fr);
+  gap: 6px;
+}
+/* week grid text color */
+.week-grid, .week-grid .hour-label, .week-grid > div { color: var(--text-foreground); }
+.week-grid .hour-label { border-top: 2px solid rgba(0,0,0,0.12); padding-top:6px; }
+
+/* half-hour lines inside each hour cell */
+.hour-cell { position: relative; overflow: visible; height: var(--hour-cell-height); }
+.hour-cell::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  height: 1px;
+  background: rgba(0,0,0,0.06);
+}
+
+/* thicker hour separators for grid column boundaries */
+.week-grid .day-column { border-left: 2px solid rgba(0,0,0,0.06); }
+.week-grid .day-column { border-left: 1px solid rgba(0,0,0,0.06); }
+.week-grid .day-column:last-child { border-right: 1px solid rgba(0,0,0,0.06); }
+.hour-cell {
+  min-height: 36px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  position: relative;
+}
+.hour-label { padding: 6px; font-size: 12px; color: inherit; }
+.day-column { padding: 4px; }
+.week-event {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  background: var(--event-color);
+  color: var(--event-foreground);
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 13px;
+  overflow: auto; /* allow scrolling when content is long */
+  max-height: 100%;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.28);
+}
+
+/* current hour line in week view */
+.current-hour-line { height:2px; pointer-events: none; border-radius: 2px; transition: top 200ms linear, left 200ms linear, width 200ms linear; }
+
+/* when events are short, increase min-height for readability */
+.week-event.short { min-height: 22px; padding: 4px 6px; font-size: 12px; }
+
+/* Today area */
+#today-area { margin-top: 6px; }
+
+/* helper tweaks */
+.settings-small { margin-left: 6px; }
+#settingsWeekBtn { width:30px; height:30px; padding:0; border-radius:6px; background:var(--accent); color:var(--accent-foreground); border:none; }
+.week-nav { gap: 32px; display:flex; }
+#weekNav .week-left { display:flex; align-items:center; gap:8px; }
+.week-nav { align-items: center; }
+.week-nav .small-nav { align-self: center; }
+
+/* hide the header settings button when in week-mode so only the week-nav settings appears */
+.calendar.week-mode #settingsBtn { display: none; }
+#settingsBtn { width:34px; height:34px; padding:0; border-radius:6px; background:var(--accent); color:var(--accent-foreground); border:none; }
+button:active { transform: translateY(1px) scale(.99); }
+.current-hour-line { transition: top 200ms linear, left 200ms linear, width 200ms linear; pointer-events: none; }
+#weekEventModal .modal-content { min-width: 360px; border-radius: 12px; }
+
+/* Modal styles */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.4);
+  z-index: 10;
+}
+.modal-content {
+  background: var(--window-bg);
+  padding: 12px;
+  border-radius: 10px;
+  min-width: 280px;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.45);
+}
+.modal-content input[type="time"], .modal-content input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 4px;
+  margin-bottom: 6px;
+}
+
+/* settings modal tweaks */
+#settingsModal .modal-content { min-width: 320px; background: var(--window-bg); }
+#weekEventModal .modal-content { background: var(--window-bg); z-index: 1001; }
+
+/* hide size slider/UI specifics (size is now controlled by CSS) */
+#sizeSlider, #autoSizeBtn, label[for="sizeSlider"] { display: none; }
+
+/* ensure month nav arrows and week nav buttons align visually */
+.calendar-header button#prevMonth, .calendar-header button#nextMonth, .week-nav .small-nav {
+  width: 42px;
+  height: 36px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+/* ===== Today highlight ===== */
+.today {
+  border: 2px solid rgba(255,255,255,0.6);
+  font-weight: 800;
+}
+
+/* ===== Empty cells ===== */
+.dates div:empty {
+  cursor: default;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ===== Responsive styles ===== */
+@media (max-width: 420px) {
+  .calendar {
+    width: 94%;
+    padding: 14px;
+  }
+  .dates div {
+    padding: 8px 0;
+    min-height: 38px;
+    font-size: 14px;
+  }
+  .calendar-header h2 { font-size: 18px; }
+}

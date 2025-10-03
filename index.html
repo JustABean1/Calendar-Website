@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS344 Lab 1 Calendar</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="rainbow-bg"></div>
+    <div class="calendar">
+        <div class="calendar-header">
+            <div style="display:flex;flex-direction:row;gap:8px;align-items:center;justify-content:center;">
+                <button id="prevMonth">&lt;</button>
+                <button id="settingsBtn" title="Settings" class="settings-small">⚙</button>
+            </div>
+            <h2 id="monthYear"></h2>
+            <button id="nextMonth">&gt;</button>
+        </div>
+
+        <!-- week-nav appears above the view buttons when in week mode -->
+        <div id="weekNav" class="week-nav" style="display:none;justify-content:space-between;margin-bottom:8px;align-items:center;">
+            <div class="week-left" style="display:flex;flex-direction:row;gap:8px;align-items:center;">
+                <button id="prevWeekBtn" class="small-nav">&lt; Week</button>
+                <button id="settingsWeekBtn" title="Settings" class="settings-small">⚙</button>
+            </div>
+            <div style="flex:1"></div>
+            <button id="nextWeekBtn" class="small-nav">Week &gt;</button>
+        </div>
+
+        <div id="controls" style="display:flex;justify-content:center;margin-bottom:8px;gap:8px;">
+            <button id="monthViewBtn" class="primary-btn">Month</button>
+            <button id="weekViewBtn" class="primary-btn">Week</button>
+        </div>
+        <div id="today-area" style="display:flex;justify-content:center;margin-bottom:8px;gap:8px;">
+            <button id="todayBtn" class="primary-btn">Today</button>
+        </div>
+        <div class="days">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+        </div>
+                <div class="dates" id="dates"></div>
+                <!-- Week view container (hidden by default) -->
+                <div id="weekView" class="week-view" style="display:none;"></div>
+    </div>
+
+    <!-- Event modal for add/edit with time fields -->
+    <div id="eventModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <h3 id="modalTitle">Add Event</h3>
+                <label>Title<br><input id="eventTitle" type="text" /></label>
+                <label>Start<br><input id="eventStart" type="time" /></label>
+                <label>End<br><input id="eventEnd" type="time" /></label>
+                <div style="margin-top:8px;display:flex;gap:8px;justify-content:flex-end;">
+                    <button id="saveEventBtn">Save</button>
+                    <button id="deleteEventBtn">Delete</button>
+                    <button id="cancelEventBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+        <!-- Settings modal -->
+        <div id="settingsModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <h3>Settings</h3>
+                <label><input type="radio" name="timeFormat" value="24" id="format24" /> 24-hour</label><br>
+                <label><input type="radio" name="timeFormat" value="12" id="format12" /> 12-hour</label>
+                <hr />
+                <label>Background</label><br>
+                <label><input type="radio" name="bgMode" value="rainbow" id="bgRainbow" /> Rainbow Gradient</label><br>
+                <label><input type="radio" name="bgMode" value="solid" id="bgSolid" /> Solid Color</label>
+                <input type="color" id="bgSolidPicker" value="#ffffff" style="margin-left:8px;" />
+                <br>
+                <label><input type="radio" name="bgMode" value="gradient" id="bgGradient" /> Two-color Gradient</label><br>
+                <input type="color" id="bgGrad1" value="#ff8e9a" />
+                <input type="color" id="bgGrad2" value="#63bbff" />
+                <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+                    <label style="font-size:12px">Gradient ratio</label>
+                    <input id="bgRatio" type="range" min="0" max="100" value="50" />
+                </div>
+                <button id="applyBgBtn">Apply Background</button>
+                <hr />
+                <label>UI Accent color</label><br>
+                <input type="color" id="colorPicker" value="#1a73e8" />
+                <button id="applyColorBtn">Apply Accent</button>
+                <div style="height:8px"></div>
+                <label>Event color</label><br>
+                <input type="color" id="eventColorPicker" value="#1a73e8" />
+                <button id="applyEventColorBtn">Apply Event Color</button>
+                <div style="margin-top:8px;display:flex;gap:8px;justify-content:flex-end;">
+                    <button id="saveSettingsBtn">Save</button>
+                    <button id="closeSettingsBtn">Close</button>
+                </div>
+        </div>
+
+        <!-- Week event edit modal (styled like calendar) - moved out so it isn't nested in settings -->
+        <div id="weekEventModal" class="modal" style="display:none;">
+            <div class="modal-content" style="background:var(--card-bg);box-shadow:0 20px 40px rgba(0,0,0,0.5);color:inherit;">
+                <h3 id="wekModalTitle">Edit Event</h3>
+                <label>Title<br><input id="wekEventTitle" type="text" /></label>
+                <label>Start<br><input id="wekEventStart" type="time" /></label>
+                <label>End<br><input id="wekEventEnd" type="time" /></label>
+                <div style="margin-top:8px;display:flex;gap:8px;justify-content:flex-end;">
+                    <button id="wekSaveBtn">Save</button>
+                    <button id="wekDeleteBtn">Delete</button>
+                    <button id="wekCancelBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
+        </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
